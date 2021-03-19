@@ -1,19 +1,20 @@
 import csv
 import os
-import codecs
+import openpyxl
 from smelter import Smelter
 
-path = r"/home/lauren/Git/cmrt-consolidation/responses"
+path = r"/home/lauren/Git/cmrt-consolidation/responses/"
 au_list = {}
 sn_list = {}
 w_list = {}
 ta_list = {}
 
 for file in os.listdir(path):
-    with codecs.open(path+'/'+file, 'r', encoding='latin-1') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        for csv_row in csv_reader:
-            smelter = Smelter(csv_row[0], csv_row[1])
+    xlsx_sheet = openpyxl.load_workbook(path+file, data_only=True)["Smelter List"]
+    for r in xlsx_sheet.rows:
+        cid = r[0].value
+        if cid is not None:
+            smelter = Smelter(cid, r[1].value)
             if smelter.metal == "Gold":
                 au_list[smelter.id_number] = smelter
             elif smelter.metal == "Tin":

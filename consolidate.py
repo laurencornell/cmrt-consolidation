@@ -22,12 +22,12 @@ def consolidate(responses_folder, template_file, output_file):
                 xlsx_sheet = openpyxl.load_workbook(os.path.join(responses_folder, file), data_only=True)["Smelter List"]
                 for r in xlsx_sheet.iter_rows(min_row=4, min_col=1):
                     cid = r[0].value
+                    if cid is None:
+                        cid = r[5].value
                     metal = r[1].value
                     if cid is None and r[3].value is None:
                         """Smelter will have one of these two values. Skip."""
-                    elif cid is not None and r[3].value is not None:
-                        """Smelter will only have one of these two values. Skip."""
-                    elif approved_smelters.__contains__(cid):
+                    elif cid.startswith("CID") and approved_smelters.__contains__(cid):
                         if metal == "Gold":
                             au_list[cid] = r
                         elif metal == "Tin":
@@ -65,7 +65,10 @@ def consolidate(responses_folder, template_file, output_file):
         for file, bad_smelters in unapproved_smelters.items():
             unapproved_sheet.cell(row=row_count, column=1, value=file)
             for bad_smelter in bad_smelters:
-                unapproved_sheet.cell(row=row_count, column=2, value=bad_smelter[0].value)
+                cell_count = 2
+                for cell in bad_smelter:
+                    unapproved_sheet.cell(row=row_count, column=cell_count, value=cell.value)
+                    cell_count += 1
                 row_count += 1
         unapproved_file.save("bad_smelters.xlsx")
 

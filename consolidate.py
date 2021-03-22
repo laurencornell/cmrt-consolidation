@@ -16,11 +16,11 @@ def consolidate(responses_folder, template_file, output_file):
                 approved_smelters.append(smelter_row[4].value)
 
     for file in os.listdir(responses_folder):
-        if file.endswith('.xlsx'):
+        if file.lower().endswith('.xlsx'):
             unapproved_rows = []
             try:
                 xlsx_sheet = openpyxl.load_workbook(os.path.join(responses_folder, file), data_only=True)["Smelter List"]
-                for r in xlsx_sheet.iter_rows(min_row=4, min_col=1):
+                for r in xlsx_sheet.iter_rows(min_row=5, min_col=1):
                     cid = r[0].value
                     if cid is None:
                         cid = r[5].value
@@ -86,13 +86,12 @@ layout = [[sg.Text('Select responses folder: '), sg.Text(' '), sg.Input(key='fol
           [sg.Text('Select the CMRT template: '), sg.Input(key='template'), sg.FileBrowse()],
           [sg.Text('Save file as: '), sg.Text(' '*18), sg.Input(key='output'), sg.Text('.xlsx')],
           [sg.Button('Consolidate')]]
-window = sg.Window('Consolidate CMRT responses', layout, size=(600, 180))
+window = sg.Window('Consolidate CMRT responses', layout)
 
 while True:
     event, values = window.read()
     if event == sg.WIN_CLOSED:
         break
     elif event == 'Consolidate':
-        window['-CON-'].update(visible=True)
         consolidate(values['folder'], values['template'], values['output'])
         break

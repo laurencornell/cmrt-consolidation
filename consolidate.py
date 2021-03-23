@@ -58,7 +58,7 @@ def consolidate(responses_folder, template_file, output_file):
     template.save(output_file+".xlsx")
 
     if len(unapproved_smelters):
-        print('There are unapproved smelters included in this list. Please check bad_smelters.xlsx for details.')
+        print('There are unapproved smelters included in this list. Please check unapproved_smelters.xlsx for details.')
         row_count = 1
         unapproved_file = openpyxl.Workbook()
         unapproved_sheet = unapproved_file.active
@@ -70,7 +70,7 @@ def consolidate(responses_folder, template_file, output_file):
                     unapproved_sheet.cell(row=row_count, column=cell_count, value=cell.value)
                     cell_count += 1
                 row_count += 1
-        unapproved_file.save('bad_smelters.xlsx')
+        unapproved_file.save('unapproved_smelters.xlsx')
 
 
 au_list = {}

@@ -18,6 +18,7 @@ def consolidate(responses_folder, template_file, output_file):
     for file in os.listdir(responses_folder):
         if file.lower().endswith('.xlsx'):
             unapproved_rows = []
+            print(file + ' is being parsed')
             try:
                 xlsx_sheet = openpyxl.load_workbook(os.path.join(responses_folder, file), data_only=True)["Smelter List"]
                 for r in xlsx_sheet.iter_rows(min_row=5, min_col=1):
@@ -25,19 +26,22 @@ def consolidate(responses_folder, template_file, output_file):
                     if cid is None:
                         cid = r[5].value
                     metal = r[1].value
-                    if cid is None and r[3].value is None:
-                        """Smelter will have one of these two values. Skip."""
-                    elif cid.startswith('CID') and approved_smelters.__contains__(cid):
-                        if metal == 'Gold':
-                            au_list[cid] = r
-                        elif metal == 'Tin':
-                            sn_list[cid] = r
-                        elif metal == 'Tungsten':
-                            w_list[cid] = r
-                        elif metal == 'Tantalum':
-                            ta_list[cid] = r
-                    else:
-                        unapproved_rows.append(r)
+                    if cid is None:
+                        if r[3].value is None:
+                            """Smelter will have one of these two values. Skip."""
+                            continue
+                        cid = r[3].value
+                    if metal == 'Gold':
+                        au_list[cid] = r
+                    elif metal == 'Tin':
+                        sn_list[cid] = r
+                    elif metal == 'Tungsten':
+                        w_list[cid] = r
+                    elif metal == 'Tantalum':
+                        ta_list[cid] = r
+                    if approved_smelters.__contains__(cid):
+                        continue
+                    unapproved_rows.append(r)
             except zipfile.BadZipFile:
                 print(file + ' did not having any smelters in Smelter List. Please verify!')
                 """ignore"""
